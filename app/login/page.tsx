@@ -1,0 +1,2 @@
+import Link from "next/link";import { AuthForm } from "@/components/auth-form";
+export default function Login(){return <main className="container page"><div className="panel form-wrap"><div className="eyebrow">WELCOME BACK, PLAYER</div><h1 className="page-title">SIGN IN</h1><p className="muted" style={{fontSize:13}}>Get back to your training journey.</p><AuthForm mode="login"/><p className="muted" style={{fontSize:12,marginTop:20}}>New to the academy? <Link href="/signup" style={{color:"#b89aff"}}>Create an account</Link></p></div></main>}

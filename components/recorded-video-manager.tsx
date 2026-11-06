@@ -1,0 +1,20 @@
+"use client";
+import {useState} from "react";
+import {createClient} from "@/lib/supabase/client";
+type Part={id:string;title:string;sort_order:number};
+type Video={id:string;title:string;part_id:string|null;vimeo_url:string;sort_order:number;is_published:boolean};
+export function RecordedVideoManager({courseId,initialParts,initialVideos}:{courseId:string;initialParts:Part[];initialVideos:Video[]}) {
+ const [parts,setParts]=useState(initialParts),[videos,setVideos]=useState(initialVideos);
+ const [partTitle,setPartTitle]=useState(""),[title,setTitle]=useState(""),[url,setUrl]=useState(""),[partId,setPartId]=useState(""),[message,setMessage]=useState("");
+ const supabase=createClient();
+ async function addPart(e:React.FormEvent){e.preventDefault();setMessage("");const {data,error}=await supabase.from("course_parts").insert({course_id:courseId,title:partTitle,sort_order:parts.length}).select().single();if(error){setMessage(error.message);return}setParts([...parts,data]);setPartTitle("");}
+ async function addVideo(e:React.FormEvent){e.preventDefault();setMessage("");if(!/^(https?:\/\/)?(www\.)?(vimeo\.com\/|player\.vimeo\.com\/video\/)/i.test(url.trim())){setMessage("Enter a valid Vimeo video URL.");return}const {data,error}=await supabase.from("course_videos").insert({course_id:courseId,part_id:partId||null,title,vimeo_url:url,sort_order:videos.length,is_published:false}).select().single();if(error){setMessage(error.message);return}setVideos([...videos,data]);setTitle("");setUrl("");}
+ async function publish(v:Video){const {error}=await supabase.from("course_videos").update({is_published:!v.is_published}).eq("id",v.id);if(error){setMessage(error.message);return}setVideos(videos.map(x=>x.id===v.id?{...x,is_published:!x.is_published}:x));}
+ async function removeVideo(v:Video){const {error}=await supabase.from("course_videos").delete().eq("id",v.id);if(error){setMessage(error.message);return}setVideos(videos.filter(x=>x.id!==v.id));}
+ return <div className="panel" style={{display:"grid",gap:24}}>
+ <section><h2 style={{fontSize:22}}>Course parts / modules</h2><form className="form" onSubmit={addPart}><label className="field">Part name<input required value={partTitle} onChange={e=>setPartTitle(e.target.value)} placeholder="e.g. Part 1 — Fundamentals"/></label><button className="btn">+ Add part</button></form>{parts.map(p=><div className="admin-panel-head" key={p.id}><strong>{p.title}</strong><span className="tag">Part</span></div>)}</section>
+ <section><h2 style={{fontSize:22}}>Add recorded Vimeo video</h2><form className="form" onSubmit={addVideo}><label className="field">Video title<input required value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Movement basics"/></label><label className="field">Vimeo URL<input required type="url" value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://vimeo.com/123456789"/></label><label className="field">Part (optional)<select value={partId} onChange={e=>setPartId(e.target.value)}><option value="">Standalone lesson / no part</option>{parts.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</select></label><button className="btn">+ Add video</button></form></section>
+ {message&&<p className="error">{message}</p>}<section><h2 style={{fontSize:22}}>Lessons ({videos.length})</h2>{videos.length===0?<p className="muted">No videos added yet.</p>:<div style={{display:"grid",gap:12}}>{videos.map(v=><div className="admin-panel-head" key={v.id}><div><strong>{v.title}</strong><p className="muted" style={{fontSize:12}}>{parts.find(p=>p.id===v.part_id)?.title??"Standalone lesson"}</p></div><div style={{display:"flex",gap:8,alignItems:"center"}}><button className="btn secondary" onClick={()=>publish(v)}>{v.is_published?"Unpublish":"Publish"}</button><button className="btn secondary" onClick={()=>removeVideo(v)}>Delete</button></div></div>)}</div>}</section>
+ <p className="muted">Tip: set Vimeo privacy to allow embedding on your LEVIATHAN domain. Lessons are unpublished until you publish them.</p>
+ </div>;
+}

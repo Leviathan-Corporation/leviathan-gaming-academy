@@ -1,0 +1,3 @@
+import Link from "next/link";
+const links=[["/admin","Overview"],["/admin/students","Students"],["/admin/coaches","Coaches"],["/admin/courses","Courses"],["/admin/enrollments","Enrollments"],["/admin/bookings","Bookings"]];
+export function AdminShell({title,children}:{title:string;children:React.ReactNode}){return <main className="container page"><div className="eyebrow">LEVIATHAN · ADMINISTRATION</div><h1 className="page-title">{title}</h1><div className="admin-layout"><aside className="admin-sidebar"><div className="admin-sidebar-label">WORKSPACE</div>{links.map(([href,label])=><Link key={href} href={href} className="admin-nav-link">{label}</Link>)}</aside><section className="admin-content">{children}</section></div></main>}

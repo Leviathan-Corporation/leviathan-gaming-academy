@@ -1,0 +1,2 @@
+import Link from "next/link";import { AuthForm } from "@/components/auth-form";
+export default function Signup(){return <main className="container page"><div className="panel form-wrap"><div className="eyebrow">JOIN THE ACADEMY</div><h1 className="page-title">CREATE ACCOUNT</h1><p className="muted" style={{fontSize:13}}>One account. Three game worlds. Endless room to improve.</p><AuthForm mode="signup"/><p className="muted" style={{fontSize:12,marginTop:20}}>Already registered? <Link href="/login" style={{color:"#b89aff"}}>Sign in</Link></p></div></main>}

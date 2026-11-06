@@ -1,0 +1,1 @@
+export function Footer(){return <footer className="footer"><div className="container" style={{display:"flex",justifyContent:"space-between",gap:15,flexWrap:"wrap"}}><span>© {new Date().getFullYear()} LEVIATHAN GAMING ACADEMY</span><span>RISE. TRAIN. DOMINATE.</span><span>Independent coaching community · Not affiliated with game publishers</span></div></footer>}
